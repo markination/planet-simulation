@@ -4,6 +4,7 @@ import pygame
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
+from OpenGL.GLUT import GLUT_BITMAP_HELVETICA_18
 from planet import Planet
 
 pygame.init()
@@ -14,9 +15,9 @@ def draw_planet(planet):
 
     glPushMatrix() 
     glTranslatef(
-        planet.x / Planet.astronomical_unit,
-        planet.y / Planet.astronomical_unit,
-        planet.z / Planet.astronomical_unit  
+        planet.x / (Planet.astronomical_unit * 2), 
+        planet.y / (Planet.astronomical_unit * 2), 
+        planet.z / (Planet.astronomical_unit * 2)  
     )
     
     quadric = gluNewQuadric()
@@ -28,9 +29,9 @@ def draw_planet(planet):
     glBegin(GL_LINE_STRIP)
     for x, y, z in planet.orbit:  
         glVertex3f(
-            x / Planet.astronomical_unit,
-            y / Planet.astronomical_unit,
-            z / Planet.astronomical_unit
+            x / (Planet.astronomical_unit * 2),  
+            y / (Planet.astronomical_unit * 2), 
+            z / (Planet.astronomical_unit * 2)  
         )
     glEnd()
 
@@ -44,40 +45,45 @@ def setup_lighting():
     glLightfv(GL_LIGHT0, GL_AMBIENT, (0.3, 0.3, 0.3, 1.0)) 
     glEnable(GL_DEPTH_TEST)  
 
-def draw_text(text, position):
-    font = pygame.font.Font(None, 36)  
-    text_surface = font.render(text, True, (255, 255, 255))  
-    text_data = pygame.image.tostring(text_surface, "RGBA", True)
-    
-    width, height = text_surface.get_size()
-    texture = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, texture)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, text_data)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+def render_text_3d(text, x, y, z):
+    glDisable(GL_LIGHTING)  
+    glColor3f(1, 1, 1) 
 
+    glMatrixMode(GL_PROJECTION)
     glPushMatrix()
-    glLoadIdentity()  
-    glTranslatef(position[0], position[1], 0)  
+    glLoadIdentity()
+    gluOrtho2D(0, 800, 0, 800)  
 
-    glBegin(GL_QUADS)
-    glTexCoord2f(0, 1)
-    glVertex2f(0, 0)
-    glTexCoord2f(1, 1)
-    glVertex2f(width, 0)
-    glTexCoord2f(1, 0)
-    glVertex2f(width, height)
-    glTexCoord2f(0, 0)
-    glVertex2f(0, height)
-    glEnd()
+    glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
+    glLoadIdentity()
+
+    glRasterPos3f(x, y, z)  
+    for char in text:
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))  
 
     glPopMatrix()
+    glMatrixMode(GL_PROJECTION)
+    glPopMatrix()
+    glMatrixMode(GL_MODELVIEW)
+
+    glEnable(GL_LIGHTING)  
+
+def draw_key(planets):
+    render_text_3d("HELLO", -300, 300, -500)
+
+    y_offset = 250
+    for planet in planets:
+        if not planet.is_sun:
+            distance_text = f"{planet.name}: {planet.distance_sun / Planet.astronomical_unit:.2f} AU"
+            render_text_3d(distance_text, -300, y_offset, -500)
+            y_offset -= 30
 
 def main():
     glutInit()  
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)  
     
-    pygame.display.set_mode((800, 800), pygame.DOUBLEBUF | pygame.OPENGL)
+    screen = pygame.display.set_mode((800, 800), pygame.DOUBLEBUF | pygame.OPENGL)
     gluPerspective(45, 1, 0.1, 1000) 
 
     setup_lighting()
@@ -85,18 +91,23 @@ def main():
 
     sun = Planet(0, 0, 0, 30, (1, 1, 0), 1.98892 * 10**30)
     sun.is_sun = True
+    sun.name = "Sun"
 
     earth = Planet(-1 * Planet.astronomical_unit, 0, 0, 16, (0, 0, 1), 5.9742 * 10**24)
     earth.y_velocity = 29.783 * 1000
+    earth.name = "Earth"
 
     mars = Planet(-1.524 * Planet.astronomical_unit, 0, 0, 12, (1, 0, 0), 6.39 * 10**23)
     mars.y_velocity = 24.077 * 1000
+    mars.name = "Mars"
 
     mercury = Planet(0.387 * Planet.astronomical_unit, 0, 0, 8, (0.4, 0.4, 0.4), 0.330 * 10**23)
     mercury.y_velocity = -47.4 * 1000
+    mercury.name = "Mercury"
 
     venus = Planet(0.723 * Planet.astronomical_unit, 0, 0, 14, (1, 1, 1), 4.8685 * 10**24)
     venus.y_velocity = -35.02 * 1000
+    venus.name = "Venus"
 
     planets = [sun, earth, mars, mercury, venus]
 
@@ -117,20 +128,7 @@ def main():
             planet.update_position(planets)
             draw_planet(planet)
         
-        earth_distance = f"Earth Distance: {earth.distance_sun / Planet.astronomical_unit:.2f} AU"
-        
-        glMatrixMode(GL_PROJECTION) 
-        glPushMatrix()  
-        glLoadIdentity() 
-        glOrtho(0, 800, 800, 0, -1, 1)
-
-        glMatrixMode(GL_MODELVIEW)  
-        draw_text(earth_distance, (20, 20))  
-        
-        glMatrixMode(GL_PROJECTION) 
-        glPopMatrix()  
-
-        glMatrixMode(GL_MODELVIEW)  
+        draw_key(planets)
 
         pygame.display.flip() 
         pygame.time.wait(10)
@@ -138,3 +136,4 @@ def main():
     pygame.quit()
 
 main()
+
