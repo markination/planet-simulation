@@ -109,26 +109,26 @@ def main():
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-    sun = Planet(0, 0, 0, 30, (1.0, 1.0, 0), 1.98892 * 10**30)  # Brighter yellow
+    sun = Planet(0, 0, 0, 30, (1.0, 1.0, 0), 1.98892 * 10**30)  
     sun.is_sun = True
     sun.name = "Sun"
 
-    earth = Planet(-1 * Planet.astronomical_unit, 0, 0, 16, (0.2, 0.4, 1.0), 5.9742 * 10**24)  # Brighter blue
+    earth = Planet(-1 * Planet.astronomical_unit, 0, 0, 16, (0.2, 0.4, 1.0), 5.9742 * 10**24)  
     earth.y_velocity = 29.783 * 1000
     earth.name = "Earth"
     earth.color_name = "BLUE"
 
-    mars = Planet(-1.524 * Planet.astronomical_unit, 0, 0, 12, (1.0, 0.2, 0.2), 6.39 * 10**23)  # Brighter red
+    mars = Planet(-1.524 * Planet.astronomical_unit, 0, 0, 12, (1.0, 0.2, 0.2), 6.39 * 10**23)  
     mars.y_velocity = 24.077 * 1000
     mars.name = "Mars"
     mars.color_name = "RED"
 
-    mercury = Planet(0.387 * Planet.astronomical_unit, 0, 0, 8, (0.6, 0.6, 0.6), 0.330 * 10**23)  # Brighter gray
+    mercury = Planet(0.387 * Planet.astronomical_unit, 0, 0, 8, (0.6, 0.6, 0.6), 0.330 * 10**23) 
     mercury.y_velocity = -47.4 * 1000
     mercury.name = "Mercury"
     mercury.color_name = "GRAY"
 
-    venus = Planet(0.723 * Planet.astronomical_unit, 0, 0, 14, (1.0, 1.0, 0.8), 4.8685 * 10**24)  # Brighter white/yellow
+    venus = Planet(0.723 * Planet.astronomical_unit, 0, 0, 14, (1.0, 1.0, 0.8), 4.8685 * 10**24)  
     venus.y_velocity = -35.02 * 1000
     venus.name = "Venus"
     venus.color_name = "WHITE"
@@ -151,7 +151,6 @@ def main():
             planet.update_position(planets) 
             draw_planet(planet)  
 
-        # Display distance from the Sun instead of the color
         render_text(f"Earth ({earth.color_name}): {earth.distance_sun / Planet.astronomical_unit:.2f} AU", 10, 10, 0)  
         render_text(f"Mars ({mars.color_name}): {mars.distance_sun / Planet.astronomical_unit:.2f} AU", 10, 40, 0)
         render_text(f"Mercury ({mercury.color_name}): {mercury.distance_sun / Planet.astronomical_unit:.2f} AU", 10, 70, 0)
