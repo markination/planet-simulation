@@ -40,7 +40,7 @@ def main():
 
         for planet in planets:
             planet.update_position(planets)
-            planet.draw(win)
+            planet.draw(win, font)
         
         pygame.display.update()
 

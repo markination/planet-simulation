@@ -1,5 +1,6 @@
 import math
 import pygame
+pygame.init()
 
 class Planet:
     astronomical_unit = 149.6e6 * 1000
@@ -24,13 +25,11 @@ class Planet:
         self.x_velocity = 0
         self.y_velocity = 0
 
-    def draw(self, window):
+    def draw(self, window, font):
         x = self.x * self.scale + 800 / 2 
         y = self.y * self.scale + 800 / 2
-        # ^ width and height of window to find the center of screen if screen is 800 x 800 
 
-
-        if len(self.orbit) >2:
+        if len(self.orbit) > 2:
             points = []
             for point in self.orbit:
                 x, y = point
@@ -40,14 +39,11 @@ class Planet:
             
             pygame.draw.lines(window, self.color, False, points, 2)
 
-
         pygame.draw.circle(window, self.color, (x, y), self.radius)
 
         if not self.is_sun:
-            from main import font
-            distance_text = font.render(f"{round(self.distance_sun / 1000), 1}km", 1, (255, 255, 255))
+            distance_text = font.render(f"{round(self.distance_sun / 1000, 1)}km", 1, (255, 255, 255))
             window.blit(distance_text, (x - distance_text.get_width()/2, y - distance_text.get_height()/2))
-
     def calculate_attraction(self, other):
         other_x, other_y = other.x, other.y
         distance_x = other_x - self.x
